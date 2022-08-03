@@ -1,7 +1,9 @@
 # InfectiousRisksAcrossScales
 This repository contains the scripts for risk assessments of viral spread in macroscopic crowds, anchored in microscopic simulations.
 
-Run:
+1) Uncompress the Diagrams.tar.xz file into a new folder Diagrams
+
+2) Run:
 * 7A to assess the risks in dynamic scenarios:
 python3 7A... num_scenario vx_wind vy_wind isotropic_inhalation
 * 7D to assess the risks in static scenarios:
