@@ -1,0 +1,6 @@
+The scripts are provided under an Open GNU GPL licence
+https://www.gnu.org/licenses/gpl-3.0.txt
+
+In short, the content can be used freely. Please just cite the following papers in any work using these scripts:
+* MENDEZ, Simon, GARCIA, Willy, et NICOLAS, Alexandre. From microscopic droplets to macroscopic crowds: Crossing the scales in models of short-range respiratory disease transmission, with application to COVID-19. arXiv preprint arXiv:2208.03147, 2022.
+* GARCIA, Willy, MENDEZ, Simon, FRAY, Baptiste, et al. Model-based assessment of the risks of viral transmission in non-confined crowds. Safety science, 2021, vol. 144, p. 105453, https://www.sciencedirect.com/science/article/pii/S0925753521002964
