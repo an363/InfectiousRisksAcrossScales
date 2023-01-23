@@ -28,7 +28,7 @@ Create a folder to store the pedestrian trajectories in files titled (group_no)_
 	
 time;x;y;theta
 
-	where
+where
 * time: timestamp in seconds associated with this line
 * x: x-position (in metres) of the pedestrian at that time
 * y: y-position (in metres) of the pedestrian at that time
@@ -47,14 +47,14 @@ or
 
 $ python3 1B_Assess_risks_static.py vx_wind vy_wind isotropic_inhalation
 
-	where
+where
 	* vx_wind: wind speed along the x-direction (in m/s)
 	* vy_wind: wind speed along the y-direction (in m/s)
 	* isotropic_inhalation: 1 if inhalation is to be considered isotropic, 0 otherwise (anisotropic inhalation)
 
 * If you want to plot the histograms of transmission risks across scenarios, run 2_Plot_risks
 
-$ python3 2_Plot_risks.py (num_scenario) (vx_wind) (vy_wind) (0/1 if isotropic inhalation)
+$ python3 2_Plot_risks.py
 
 after amending the directory names in the FILES section (around line 20)
 
