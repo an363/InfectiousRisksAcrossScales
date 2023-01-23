@@ -1,52 +1,42 @@
 #! coding: utf-8 
 import numpy as np, time
-from matplotlib import pyplot as plt
 from math import exp, pi, floor, cos, sin, sqrt, atan
 import pandas as pd
 from random import random
-import os, sys, time
+import os, re, sys, time
 import pickle
 
 
-# call file with 
-
-### PARAMETERS ###
-Activity= "_breathing" # "_speaking" # "_large_droplets" #  "_large_droplets" #    "_breathing" #      "_breathing" # "_speaking" #   "_breathing" # "_speaking" #  ""# #
-tau_max= 21.0 #!! maximum delay between droplet emission and inhalation
-ContagionAmidGroups= False #!! allow (or not) an agent to infect members of his/her group on site
-DELTAT= 3600. # total time considered for risks of infection
-
-if len(sys.argv)>=4:
-	num_scenario= int(float(sys.argv[1]))
-	v_wind= (float(sys.argv[2]), float(sys.argv[3]) )
-	iso_inh= bool(int(sys.argv[4]))
-else:
-	print("WATCH OUT: no input scenario nor wind speed. \n I hope you know what you are doing...")
-	num_scenario= 0
-	v_wind= (-1e3,-1e3)
-	iso_inh= False
-	
-	
 ######### FILES #########
-GeneralFolder= "Data/"
-FolderDiagrams= "Diagrams/"
+FolderTraj= "Example_Data/Centre_Depistage_Gerland" # folder containing the trajectories in CSV format
+FolderDiagrams= "Diagrams/" # folder containg the dynamic viral concentration maps
 
-Scenarios= {0: "Pont_Morand"}
-
-if len(sys.argv)>=4:
-    num_scenario= int(sys.argv[1])
-    v_wind= (float(sys.argv[2]), float(sys.argv[3]) )
-    iso_inh= bool(int(sys.argv[4])) # True if isotropic inhalation
-else:
-	print("WATCH OUT: no input scenario nor wind speed. \n I hope you know what you are doing...")
-	num_scenario= 0
-	v_wind= (-1e3,-1e3)
-	iso_inh= False
-
-Activity=  "_speaking" # "" # "_large_droplets"
-tau_max= 21.0 # maximum delay between droplet emission and inhalation
+######### MODEL PARAMETERS ######### 
+Activity= "_speaking" # Mode of emission of respiratory droplets -- choose between (i) "_speaking", (ii) "_breathing", (iii) "_large_droplets" 
 ContagionAmidGroups= False # allow (or not) an agent to infect members of his/her group on site
-DELTAT= 3600. # total time considered for risks of infection
+Infection_time_T0= 900 # characteristic time (in seconds) for viral infection if somebody is facing you at 50 cm distance and talking with you 
+DELTAT= 3600. # time window (in seconds) over which infection risks are computed
+tau_max= 21.0 # maximum delay between droplet emission and inhalation -- leave as it is, unless you use new dynamic concentration maps
+	
+######## SCENARIO CHARACTERISTICS #######
+# The following parameters help compensate an inexhaustive sampling of pedestrians. 
+# If the field of view was small and some people thus failed to be detected, we will try to compensate for missed interactions with people off camera by renormalising the interaction frequency
+# and to account for past interactions between pedestrians i and j (who might already have infected one another on the premises, before they were observed by us.
+# Set these parameters to very large values if all pedestrians could be observed / simulated.
+(Lx,Ly)= (200,200) # x- and y- dimensions (in metres) of the field of view in which pedestrian -- if the field of view was small,
+tau_together= 120. # max time (in seconds) spent together by pedestrians i and j -
+	
+
+######## COMMAND-LINE ARGUMENTS #########
+if len(sys.argv)>=3:
+	v_wind= (float(sys.argv[1]), float(sys.argv[2]) )
+	iso_inh= bool(int(sys.argv[3]))
+else:
+	print("Aborting: no input scenario nor wind speed. \n Please type in: \n\t  python3 1***.py vx_wind vy_wind isotropic_inhalation\n where\n * vx_wind: wind speed along x (in m/s) \n * vy_wind: wind speed along y (in m/s)\n * isotropic_inhalation: 0 if anisotropic inhalation factor, 1 if isotropic inhalation ")
+	quit()
+	
+
+
 
 suffix= "%s_%.1f_%.1f%s_%s"%("_InfAmidGroups" if ContagionAmidGroups else "",
 				  v_wind[0],
@@ -55,41 +45,26 @@ suffix= "%s_%.1f_%.1f%s_%s"%("_InfAmidGroups" if ContagionAmidGroups else "",
                   "iso" if iso_inh else "aniso")
 
 
-PickleFolder= GeneralFolder+ Scenarios[num_scenario]
-
-# Save a copy of the input scripts #
-myScriptID= int(time.time())
-os.system ( "tar -zcf ScriptsExecutes/scripts_" +  str(myScriptID) + "_" + sys.argv[0][0:2]+ "_" + str(num_scenario) + ".tar.gz  *.py" );
-# #
-
-if Scenarios[num_scenario]=="Pont_Morand":
-	(Lx,Ly)= (200,9.6) # Pont Morand, formerly (5.4,7.75). Now: (3.5,9.6) but unbounded in the x-direction. NEW surface area: 25.7 m^2 
-	tau_together= 300.
-
-print(" Scenario under study: %s"%Scenarios[num_scenario])
 ### ###
 
 class Parameters(object):	
-
 	
-	def __init__(self, Pname, Pd0, PT0, Pthetae0, Pthetar0, Pfonction):
+	def __init__(self, Pname, Pd0, PT0, Pthetae0, Pthetar0):
 		self.name= Pname # scenario name
 		self.d0= Pd0 # characteristic distance for infection
 		self.T0= PT0 # characteristic time for infection
 		self.thetae0= Pthetae0 # angle of emitter (e), also called psi elsewhere
 		self.thetar0= Pthetar0 # angle of receiver (r), also called phi elsewhere
-		self.fonction= Pfonction # type of decay function used in f
 		
 ######### MODEL PARAMETERS #########
 model_parameters= {}
 model_parameters_from_name= {}
-def set_new_model_parameters(model_parameters, name, d0, T0, thetae0, thetar0, liste_fonctions):
-	for fonction in liste_fonctions:
-		nb_models= len(model_parameters)
-		model_parameters[nb_models]= Parameters(Pname= "%s_%s"%(name,fonction), Pd0= d0, PT0= T0, Pthetae0= thetae0, Pthetar0= thetar0, Pfonction=fonction)
-		model_parameters_from_name["%s_%s"%(name,fonction)]= model_parameters[nb_models]
+def set_new_model_parameters(model_parameters, name, d0, T0, thetae0, thetar0):
+	nb_models= len(model_parameters)
+	model_parameters[nb_models]= Parameters(Pname= "%s"%name, Pd0= d0, PT0= T0, Pthetae0= thetae0, Pthetar0= thetar0,)
+	model_parameters_from_name["%s"%name]= model_parameters[nb_models]
 
-set_new_model_parameters(model_parameters, name= 'standard10', d0= 0.5, T0= 900., thetae0= 0, thetar0= 0, liste_fonctions=["exp"])
+set_new_model_parameters(model_parameters, name= 'standard', d0= 0.5, T0= Infection_time_T0, thetae0= 0, thetar0= 0)
 
 
 ######### DEFINITION OF THE TRANSMISSION MODEL #########
@@ -101,12 +76,12 @@ def get_norm(v):
 
 def make_filename(speed,speed_walk,phi,mode="ICS",activity=Activity):
 	if speed==0.0:
-		return FolderDiagrams+"diagram_v=0.0_vwalk=%.1f_phi=0_%s%s.pkl"%(speed_walk,mode,activity if activity!="_breathing" else "") #!! WATCH OUT: this does not really encompass cases with vwalk!=0
+		return FolderDiagrams+"diagram_v=0.0_vwalk=%.1f_phi=0_%s%s.pkl"%(speed_walk,mode,activity if activity!="_breathing" else "") 
 	return FolderDiagrams+"diagram_v=%.1f_vwalk=%.1f_phi=%d_%s%s.pkl"%(speed,
 														  speed_walk,
 														  phi,
 														  mode,
-                                                          activity if activity!="_breathing" else "")
+                                            activity if activity!="_breathing" else "")
 	
 def convert_theta(x, dx):
     return round(dx * round(x/dx,0),2)
@@ -114,7 +89,7 @@ def convert_theta(x, dx):
 def convert_others(x,dx):
     return round(dx * np.floor(x/dx+1e-3),1)
 
-delta_tau= 0.2 # bins of 0.2 seconds
+delta_tau= 0.2 # bins of 0.2 seconds for the concentration maps
 delta_r= 0.2 # bins of radius 0.3 m
 delta_theta= np.pi/12.0
 								  
@@ -144,6 +119,8 @@ def load_diagrams():
 	print(" * I have finished loading the spatiotemporal diagrams of risks")
 	return spatiotemp_diagrams
 
+
+### LOADING DYNAMIC CONCENTRATION MAPS ###
 speed_walks= np.array( list(map(lambda x : round(x,1), np.arange(0,2.0,0.1))))
 speeds= np.array([0.0,0.3,1.0,2.0])
 speed_max= max(speeds)
@@ -153,26 +130,10 @@ phis_rad= np.array(list(map(lambda phi: convert_theta(pi/180. * phi,delta_theta)
 phi_max= max(phis_rad)
 phi_min= min(phis_rad)
 
-spatiotemp_diagrams= load_diagrams()
-#phis_degrees= np.array([0, 30., 60., 135., 180.]) # between - pi and pi
-#phis_rad= np.array(list(map(lambda phi: convert_theta(pi/180. * phi,delta_theta), phis_degrees)))
-
-
+spatiotemp_diagrams= load_diagrams() # Loads the dynamics viral concentration maps
 
 ### Renormalisation coefficient Z ###
 Z= 1.253489635
-print("Renormalisation factor: ", Z)
-
-### ###
-
-
-
-
-
-
-
-
-
 
 
 
@@ -220,10 +181,8 @@ def get_nu_dynamic(v_walk,v_wind,r_vec,theta_e,theta_r,delay,parameters): #
 	if iso_inh:
 		receiver_factor= 1.0 # isotropic case
 	else:
-		receiver_factor= 1.0 if abs(theta_R)<0.5*pi else 0.0 # #!! # case in which inhalation vanishes to zero when face is opposed to main direction
-	## old case
-	#receiver_factor= min(1.0,exp(-abs(theta_R/parameters.thetar0))/exp(-1)) #!!
-	
+		receiver_factor= 1.0 if abs(theta_R)<0.5*pi else 0.0 # case in which inhalation vanishes to zero when face is opposed to main direction
+
 		
 	return diagram.get(theta_ER_cg, 0.0) * receiver_factor / parameters.T0 / Z
 #######################################################
@@ -359,9 +318,7 @@ def get_rescaling_factor(Lx,Ly):
 			x,y= (x_c + R * cos(theta),y_c+ R * sin(theta))
 			if x<0 or x>Lx or y<0 or y>Ly: # out of bounds
 				nb_points_out_of_rectangle+=1
-			"""	plt.plot(x,y,'rx')
-			else:
-				plt.plot(x,y,'gx')"""
+
 				
 		rescaling_factor[int(10*R)]= max(1.0, 1.0 / (1.0 + 0.05 - nb_points_out_of_rectangle / nb_points)) # 0.05 is to avoid diverging rescaling factors
 	return rescaling_factor
