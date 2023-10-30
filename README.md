@@ -20,9 +20,11 @@ These scripts only require Python3, with the following fairly common modules: nu
 
 2) COLLECT PEDESTRIAN TRAJECTORIES
 
-Create a folder to store the pedestrian trajectories in files titled (group_no)_(ped_no).csv, where
-* group_no: an integer label for the group to which the pedestrian belongs 
-* ped_no: an integer label for the pedestrian 
+Create a folder to store the pedestrian trajectories; the folder name should end with "_static" for a static scenario, or "_dynamic" for a dynamic scenario.
+Trajectory files should be named [GROUP-ID]_[PED-ID].csv, where
+* [GROUP-ID]: an integer label for the group to which the pedestrian belongs 
+* [PED-ID]: an integer label for the pedestrian 
+E.g., 1_3.csv, for pedestrian 3 belonging to social group 1.
 
 	Each file is specific to one pedestrian and should contain the following columns, with no header
 	
@@ -39,29 +41,27 @@ Should you want to recover the transmission rate values provided in our paper fo
 
 3) RUN RISK ASSESSMENT SCRIPTS
 
-* Amend the Python script "toolbox.py" by linking the adequate input files (FILES section, lines 11-12) and adjusting the model parameters if need be (MODEL PARAMETERS, lines 15-17)
+* Amend the input file "InputFile" : 
+--------------------------------------
+DiagramsFolder= [FULL PATH TO FOLDER WITH SPATIO-TEMPORAL DIAGRAMS]
+OutputFolder= [FULL PATH TO OUTPUT FOLDER]
+TrajectoryFolder= [FULL PATH TO FOLDER WITH TRAJECTORIES]
+T0= [characteristic infection time, in seconds]
+(vx,vy)= (v_x,v_y) in m/s # external wind speed
+ExhalationMode= [choose between: breathing / speaking / large\_droplets]
+IsotropicInhalation= [choose between: True / False] # Can agents can inhale aerosols coming hitting the back of their heads? By default, we recommend to set it to False
+ContagionAmidGroups= [choose between: True / False] # Can infect other members of their social group?
+--------------------------------------
+
+Note that semi-colons can be used to separate multiple input conditions if the user wants to launch multiple runs sequentially with a single input file, for instance (vx,vy)=(0.0,0.0);(-0.2,0.5) or ExhalationMode=speaking;breathing.
+
 * Run the relevant script (scenario with moving people: 1A_Assess_risks_dynamic.py, mostly static crowd: 1B_Assess_risks_static.py):
 
-$ python3 1A_Assess_risks_dynamic.py vx_wind vy_wind isotropic_inhalation
-
-or
-
-$ python3 1B_Assess_risks_static.py vx_wind vy_wind isotropic_inhalation
-
-where
-	* vx_wind: wind speed along the x-direction (in m/s)
-	* vy_wind: wind speed along the y-direction (in m/s)
-	* isotropic_inhalation: 1 if inhalation is to be considered isotropic, 0 otherwise (anisotropic inhalation)
-
-* If you want to plot the histograms of transmission risks across scenarios, run 2_Plot_risks
-
-$ python3 2_Plot_risks.py
-
-after amending the directory names in the FILES section (around line 20)
+$ python3 main.py
 
 4) READ THE RESULTS
 
-Besides the Pickle dump, the results in terms of mean infection rates are saved as CSV files under the "Risks" repository: 
+The results in terms of infection rates caused by an individual in the OutputFolder repository
 * "Clow_bar": lower bound on the assessed mean rate of new infections (new cases per hour)
 * "Chigh_bar": upper bound on the assessed mean rate of new infections (new cases per hour), taking into account possible previous interactions between pedestrians, out of the field of view
 
