@@ -35,6 +35,7 @@ where
 * theta: angle (in rad) denoting the orientation of the pedestrian's head at that time, in the (x,y) frame
 
 NB: Example data are proposed in the "Example_Data" directory. These correspond to the data of the 2021 paper referenced below; further information can be found in the paper and in the online repository https://zenodo.org/record/4527462
+Should you want to recover the transmission rate values provided in our paper for these field data, do not forget to correct the size of the (narrow) empirical field of view on line 29 of toolbox.py
 
 3) RUN RISK ASSESSMENT SCRIPTS
 
