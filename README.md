@@ -55,7 +55,7 @@ ContagionAmidGroups= [choose between: True / False] # Can infect other members o
 
 Note that semi-colons can be used to separate multiple input conditions if the user wants to launch multiple runs sequentially with a single input file, for instance (vx,vy)=(0.0,0.0);(-0.2,0.5) or ExhalationMode=speaking;breathing.
 
-* Run the relevant script (scenario with moving people: 1A_Assess_risks_dynamic.py, mostly static crowd: 1B_Assess_risks_static.py):
+* Run the script with Python 3
 
 $ python3 main.py
 
