@@ -61,6 +61,6 @@ $ python3 main.py
 
 4) READ THE RESULTS
 
-The results in terms of infection rates caused by an individual in the OutputFolder repository, with one folder for each set of conditions. Each folder contains a summary of the parameters (parameters.txt), a file detailing how many new cases each distinct agent would cause per hour, should they be contagious (Risks_by_person_output...dat}), and one file containing the mean number of new cases per hour (Risks_mean_output...dat). Within each file, the columns Clow and Cbar refer to:
+The results in terms of infection rates caused by an individual in the OutputFolder repository, with one folder for each set of conditions. Each folder contains a summary of the parameters (parameters.txt), a file detailing how many new cases each distinct agent (ped_ID) would cause per hour, should they be contagious (Risks_by_person_output...dat}), and one file containing the mean number of new cases per hour (Risks_mean_output...dat). Within each file, the columns Clow and Cbar refer to:
 * "Clow": lower bound on the assessed mean rate of new infections (new cases per hour)
 * "Chigh": upper bound on the assessed mean rate of new infections (new cases per hour), taking into account possible previous interactions between pedestrians, out of the field of view
