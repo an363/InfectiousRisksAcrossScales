@@ -570,7 +570,7 @@ def writeDynamicResults(folder,SaveRisksFile, mypedestrians, myrisks):
 
 	
 	with open(folder+"/Risks_by_person_"+SaveRisksFile,'w') as monfichier:
-		monfichier.write("ped_no;Clow;Cbar")
+		monfichier.write("ped_ID;Clow;Cbar")
 		for row in mypedestrians.itertuples():
 			monfichier.write("\n%i;%.4e;%.4e"%(row.ped_no,row.Clowi,row.Cbari))
 			

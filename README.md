@@ -20,13 +20,13 @@ These scripts only require Python3, with the following fairly common modules: nu
 
 2) COLLECT PEDESTRIAN TRAJECTORIES
 
-Create a folder to store the pedestrian trajectories; the folder name should end with "_static" for a static scenario, or "_dynamic" for a dynamic scenario.
-Trajectory files should be named [GROUP-ID]_[PED-ID].csv, where
+Create a folder to store the pedestrian trajectories; the folder name should end with the suffix "_static" for a static scenario, or "_dynamic" for a dynamic scenario (see the examples in "Example_data").
+Within this folder, create one text file for each pedestrian's trajectory and name it [GROUP-ID]_[PED-ID].csv, where
 * [GROUP-ID]: an integer label for the group to which the pedestrian belongs 
 * [PED-ID]: an integer label for the pedestrian 
 E.g., 1_3.csv, for pedestrian 3 belonging to social group 1.
 
-	Each file is specific to one pedestrian and should contain the following columns, with no header
+	Each file should contain the following columns, with no header
 	
 time;x;y;theta
 
@@ -34,14 +34,14 @@ where
 * time: timestamp in seconds associated with this line
 * x: x-position (in metres) of the pedestrian at that time
 * y: y-position (in metres) of the pedestrian at that time
-* theta: angle (in rad) denoting the orientation of the pedestrian's head at that time, in the (x,y) frame
+* theta: angle (in rad) denoting the orientation of the pedestrian's head at that time, in the (x,y) frame. theta=0 corresponds to the +x-axis.
 
 NB: Example data are proposed in the "Example_Data" directory. These correspond to the data of the 2021 paper referenced below; further information can be found in the paper and in the online repository https://zenodo.org/record/4527462
 Should you want to recover the transmission rate values provided in our paper for these field data, do not forget to correct the size of the (narrow) empirical field of view on line 29 of toolbox.py
 
 3) RUN RISK ASSESSMENT SCRIPTS
 
-* Amend the input file "InputFile" : 
+* Amend the input file "InputFile.txt" : 
 --------------------------------------
 DiagramsFolder= [FULL PATH TO FOLDER WITH SPATIO-TEMPORAL DIAGRAMS]
 OutputFolder= [FULL PATH TO OUTPUT FOLDER]
@@ -55,14 +55,12 @@ ContagionAmidGroups= [choose between: True / False] # Can infect other members o
 
 Note that semi-colons can be used to separate multiple input conditions if the user wants to launch multiple runs sequentially with a single input file, for instance (vx,vy)=(0.0,0.0);(-0.2,0.5) or ExhalationMode=speaking;breathing.
 
-* Run the script with Python 3
+* Run the script with Python 3, e.g., by typing in a terminal
 
 $ python3 main.py
 
 4) READ THE RESULTS
 
-The results in terms of infection rates caused by an individual in the OutputFolder repository
-* "Clow_bar": lower bound on the assessed mean rate of new infections (new cases per hour)
-* "Chigh_bar": upper bound on the assessed mean rate of new infections (new cases per hour), taking into account possible previous interactions between pedestrians, out of the field of view
-
-
+The results in terms of infection rates caused by an individual in the OutputFolder repository, with one folder for each set of conditions. Each folder contains a summary of the parameters (parameters.txt), a file detailing how many new cases each distinct agent would cause per hour, should they be contagious (Risks_by_person_output...dat}), and one file containing the mean number of new cases per hour (Risks_mean_output...dat). Within each file, the columns Clow and Cbar refer to:
+* "Clow": lower bound on the assessed mean rate of new infections (new cases per hour)
+* "Chigh": upper bound on the assessed mean rate of new infections (new cases per hour), taking into account possible previous interactions between pedestrians, out of the field of view
