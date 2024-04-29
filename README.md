@@ -44,13 +44,21 @@ Should you want to recover the transmission rate values provided in our paper fo
 * Amend the input file "InputFile.txt" : 
 --------------------------------------
 DiagramsFolder= [FULL PATH TO FOLDER WITH SPATIO-TEMPORAL DIAGRAMS]
+
 OutputFolder= [FULL PATH TO OUTPUT FOLDER]
+
 TrajectoryFolder= [FULL PATH TO FOLDER WITH TRAJECTORIES]
+
 T0= [characteristic infection time, in seconds]
+
 (vx,vy)= (v_x,v_y) in m/s # external wind speed
+
 ExhalationMode= [choose between: breathing / speaking / large\_droplets]
+
 IsotropicInhalation= [choose between: True / False] # Can agents can inhale aerosols coming hitting the back of their heads? By default, we recommend to set it to False
+
 ContagionAmidGroups= [choose between: True / False] # Can infect other members of their social group?
+
 --------------------------------------
 
 Note that semi-colons can be used to separate multiple input conditions if the user wants to launch multiple runs sequentially with a single input file, for instance (vx,vy)=(0.0,0.0);(-0.2,0.5) or ExhalationMode=speaking;breathing.
