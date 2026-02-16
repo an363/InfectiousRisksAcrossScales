@@ -3,10 +3,10 @@ This repository contains the scripts for risk assessments of viral spread in mac
 ******************************************************
 ******************************************************
 The content can be used freely. Please cite at least one of the first two papers below in any work using these scripts:
-* NICOLAS, Alexandre & MENDEZ, Simon (2024). Viral transmission in pedestrian crowds: Coupling an open-source code assessing the risks of airborne contagion with diverse pedestrian dynamics models. Collective Dynamics (2024),  https://doi.org/10.17815/CD.2024.159
+* NICOLAS, Alexandre & MENDEZ, Simon. Viral transmission in pedestrian crowds: Coupling an open-source code assessing the risks of airborne contagion with diverse pedestrian dynamics models. Collective Dynamics (2024),  https://doi.org/10.17815/CD.2024.159
 ​https://doi.org/10.17815/CD.2024.159, https://www.collective-dynamics.eu/index.php/cod/article/view/A159
 * MENDEZ, Simon, GARCIA, Willy, et NICOLAS, Alexandre. From Microscopic Droplets to Macroscopic Crowds: Crossing the Scales in Models of Short-Range Respiratory Disease Transmission, with Application to COVID-19, Advanced Science (2023), https://doi.org/10.1002/advs.202205255
-* GARCIA, Willy, MENDEZ, Simon, FRAY, Baptiste, et al. Model-based assessment of the risks of viral transmission in non-confined crowds. Safety science, 2021, vol. 144, p. 105453, https://www.sciencedirect.com/science/article/pii/S0925753521002964
+* GARCIA, Willy, MENDEZ, Simon, FRAY, Baptiste, et al. Model-based assessment of the risks of viral transmission in non-confined crowds. Safety science (2021), vol. 144, p. 105453, https://www.sciencedirect.com/science/article/pii/S0925753521002964
 ******************************************************
 ******************************************************
 
